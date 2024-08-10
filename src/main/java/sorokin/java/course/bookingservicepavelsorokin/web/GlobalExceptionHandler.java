@@ -4,10 +4,12 @@ import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 @ControllerAdvice
@@ -47,5 +49,16 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return ResponseEntity.status(400).body(messageResponse);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Object> handleBadCredentials(Exception e) {
+        LOGGER.error("Bad credentials exception", e);
+        ErrorMessageResponse messageResponse = new ErrorMessageResponse(
+                "Bad credentials",
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(401).body(messageResponse);
     }
 }

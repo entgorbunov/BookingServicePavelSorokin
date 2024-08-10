@@ -5,8 +5,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LocationDtoMapper {
 
-    public LocationDtoMapper() {
-    }
+
 
     public static LocationDto toDto(Location location) {
         return new LocationDto(

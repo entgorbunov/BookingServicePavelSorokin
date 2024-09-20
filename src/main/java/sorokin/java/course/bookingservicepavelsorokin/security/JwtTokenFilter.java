@@ -11,6 +11,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import sorokin.java.course.bookingservicepavelsorokin.users.service.User;
+import sorokin.java.course.bookingservicepavelsorokin.users.service.UserService;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,10 +23,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(JwtTokenFilter.class);
 
     private final JwtManager jwtManager;
+    private final UserService userService;
 
-    public JwtTokenFilter(JwtManager jwtManager) {
+    public JwtTokenFilter(JwtManager jwtManager, UserService userService) {
         this.jwtManager = jwtManager;
+        this.userService = userService;
     }
+
+
 
     @Override
     protected void doFilterInternal(
@@ -57,12 +63,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String login = jwtManager.getLoginFromToken(token);
         String role = jwtManager.getRoleFromToken(token);
 
+        User userByLogin = userService.getUserByLogin(login);
+
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                login,
+                userByLogin,
                 null,
                 List.of(new SimpleGrantedAuthority(role)));
-        SecurityContextHolder.getContext().setAuthentication(authToken);
 
+        SecurityContextHolder.getContext().setAuthentication(authToken);
         filterChain.doFilter(request, response);
     }
 

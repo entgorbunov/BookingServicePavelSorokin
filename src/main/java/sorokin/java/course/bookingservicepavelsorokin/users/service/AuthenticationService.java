@@ -2,6 +2,7 @@ package sorokin.java.course.bookingservicepavelsorokin.users.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sorokin.java.course.bookingservicepavelsorokin.security.JwtManager;
@@ -10,9 +11,10 @@ import sorokin.java.course.bookingservicepavelsorokin.users.web.SignInRequest;
 @Service
 public class AuthenticationService {
 
-private final JwtManager jwtManager;
-private final UserService userService;
-private final PasswordEncoder passwordEncoder;
+    private final JwtManager jwtManager;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
     public AuthenticationService(JwtManager jwtManager, UserService userService, PasswordEncoder passwordEncoder) {
         this.jwtManager = jwtManager;
@@ -34,4 +36,14 @@ private final PasswordEncoder passwordEncoder;
 
         return jwtManager.generateToken(user);
     }
+
+    public User getCurrentAuthenticatedUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof User user) {
+            return user;
+        } else throw new BadCredentialsException("Invalid user");
+    }
+
+
+
 }
